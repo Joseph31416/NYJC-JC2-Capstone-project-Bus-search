@@ -64,3 +64,19 @@ def find_max_min(arr, key, mode):
                 raise ValueError
     return target
 
+
+def dist_range(distance):
+    lower = 3.3
+    if distance <= 3.2:
+        return "0.0 km - 3.2 km"
+    while distance >= round(lower, 2) and lower < 40.1:
+        lower += 1
+    lower -= 1
+    if round(lower, 2) == 40.2:
+        return "39.3 km - 40.2 km"
+    elif lower > 40.1:
+        return "Over 40.2 km"
+    else:
+        return f"{round(lower, 2)} km - {round(lower + 0.9, 2)} km"
+
+

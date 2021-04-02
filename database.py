@@ -1,15 +1,12 @@
 import sqlite3
 import json
-from calculation import quick_sort, find_max_min, insertion_sort
+from calculation import quick_sort, find_max_min, insertion_sort, dist_range
 import math
+import csv
 
 
 def create_conn():
     return sqlite3.connect("records.db")
-
-
-def create_cur(conn):
-    return conn.cursor()
 
 
 def close_conn(conn):
@@ -22,17 +19,24 @@ def data_retrieval(filename):
     return data
 
 
-def insertion(conn, cur):
-    delete = """DELETE FROM "Bus_routes" """
+def data_retrieval_fare(filename):
+    with open(f"./fare_data/{filename}.csv") as f:
+        reader = csv.reader(f)
+        return [row for row in reader]
+
+
+def insertion(conn):
+    delete = """DELETE FROM "Bus_services" """
+    cur = conn.cursor()
     cur.execute(delete)
     conn.commit()
     insert = """
-            INSERT INTO "Bus_routes" VALUES (?, ?, ?, ?, ?);
+            INSERT INTO "Bus_services" VALUES (?, ?, ?, ?, ?);
             """
-    for entry in data_retrieval("bus_routes"):
+    for entry in data_retrieval("bus_services"):
         print(entry)
-        cur.execute(insert, (entry["ServiceNo"], entry["Direction"],
-                             entry["StopSequence"], entry["BusStopCode"], entry["Distance"]))
+        cur.execute(insert, (entry["ServiceNo"], entry["Category"],
+                             entry["Direction"], entry["OriginCode"], entry["DestinationCode"]))
     conn.commit()
 
 
@@ -102,35 +106,86 @@ def find_multiple_stops(conn):
     print(common)
 
 
-def optimal(conn, mode: str, start, end, routes):
-        cur = create_cur(conn)
+def optimal(conn, mode: str, start, end,
+            routes, group="adult", payment_mode="cash"):
+        cur = conn.cursor()
         results = []
-        if mode == "distance":
-            for route in routes:
-                query = """
-                        SELECT DISTINCT "BusStopCode", "Direction", "StopSequence", "Distance"
-                        FROM "Bus_routes"
-                        WHERE "ServiceNo"=? 
-                        AND "Direction"=?
-                        AND ("BusStopCode"=? 
-                        OR "BusStopCode"=?);
+        group_payment = {
+            ("adult", "cash"): "Adult_cash_fare",
+            ("adult", "card"): "Adult_card_fare",
+            ("senior", "cash"): "Senior_cash_fare",
+            ("senior", "card"): "Senior_card_fare",
+            ("student", "cash"): "Student_cash_fare",
+            ("student", "card"): "Student_card_fare",
+            ("workfare", "cash"): "Workfare_cash_fare",
+            ("workfare", "card"): "Workfare_card_fare",
+            ("disabilities", "cash"): "Disabilities_cash_fare",
+            ("disabilities", "card"): "Disabilities_card_fare"
+        }
+        for route in routes:
+            query = """
+                    SELECT DISTINCT "Bus_routes"."BusStopCode", "Bus_routes"."Direction",
+                     "Bus_routes"."StopSequence", "Bus_routes"."Distance", "Bus_services"."Category"
+                    FROM "Bus_routes"
+                    INNER JOIN "Bus_services"
+                    ON ("Bus_routes"."ServiceNo"="Bus_services"."ServiceNo" AND 
+                     "Bus_routes"."Direction"="Bus_services"."Direction")
+                    WHERE "Bus_routes"."ServiceNo"=? 
+                    AND "Bus_routes"."Direction"=?
+                    AND ("Bus_routes"."BusStopCode"=? 
+                    OR "Bus_routes"."BusStopCode"=?);
+                    """
+            cur.execute(query, (route[0], route[1], start, end))
+            fetch = cur.fetchall()
+            distance = round(math.fabs(fetch[0][3] - fetch[1][3]), 2)
+            category = fetch[0][4]
+            if category == "TRUNK":
+                tb_name = "Fare_trunk"
+                tb_dist = dist_range(distance)
+                tb_col = group_payment[(group, payment_mode)]
+                query = f"""
+                        SELECT "{tb_col}"
+                        FROM "{tb_name}"
+                        WHERE "Distance"=?;
                         """
-                cur.execute(query, (route[0], route[1], start, end))
-                fetch = cur.fetchall()
-                results.append(
-                    {
-                        "route": route[0], "distance": round(math.fabs(fetch[0][3] - fetch[1][3]), 4)
-                    }
-                )
-        results = insertion_sort(results, "route", "asc")
-        results = insertion_sort(results, "distance", "asc")
+                cur.execute(query, (tb_dist, ))
+                fare = cur.fetchone()[0]
+            elif category == "FEEDER":
+                tb_name = "Fare_feeder"
+                tb_col = group_payment[(group, payment_mode)]
+                query = f"""
+                        SELECT "{tb_col}"
+                        FROM "{tb_name}";
+                        """
+                cur.execute(query)
+                fare = cur.fetchone()[0]
+            else:
+                tb_name = "Fare_express"
+                tb_dist = dist_range(distance)
+                if payment_mode == "cash":
+                    tb_col = "Cash_fare"
+                else:
+                    tb_col = f"{group}_card_fare".title()
+                query = f"""
+                        SELECT "{tb_col}"
+                        FROM "{tb_name}"
+                        WHERE "Distance"=?;
+                        """
+                cur.execute(query, (tb_dist,))
+                fare = cur.fetchone()[0]
+            results.append(
+                {
+                    "route": route[0], "distance": distance, "fare": fare
+                }
+            )
+            results = insertion_sort(results, "route", "asc")
+            results = insertion_sort(results, mode, "asc")
+
         return results
 
 
-
-connection = create_conn()
-routes = find_routes(connection, ("01012", "01311"))
-print(f"routes: {routes}")
+# connection = create_conn()
+# routes = find_routes(connection, ("01012", "01311"))
 # find_multiple_stops(connection)
-print(optimal(connection, "distance", "01012", "01311", routes))
-close_conn(connection)
+# print(optimal(connection, "fare", "01012", "01311", routes, "student", "card"))
+# close_conn(connection)

@@ -7,13 +7,35 @@
 <body>
 <p>Enter your search here:</p>
 <form method="POST">
-    <input type="text" name="BusStop1"> <br>
-    <input type="text" name="BusStop2"> <br>
-    <input type="radio" id="dist" name="Distance" value="Distance">
+    <p>Starting point: </p>
+    <input type="text" name="BusStop1" required> <br>
+    <p>Destination: </p>
+    <input type="text" name="BusStop2" required> <br>
+    <p>Sort by: </p>
+    <input type="radio" id="dist" name="mode" value="distance" required>
     <label for="dist">Distance</label>
-    <input type="radio" id="fare" name="Fare" value="Fare">
+    <input type="radio" id="fare" name="mode" value="fare" required>
     <label for="fare">Fare</label> <br>
+    <p>I am a/an:</p>
+    <input type="radio" id="adult" name="group" value="adult" required>
+    <label for="adult">Adult</label> <br>
+    <input type="radio" id="student" name="group" value="student" required>
+    <label for="student">Student</label> <br>
+    <input type="radio" id="workfare" name="group" value="workfare" required>
+    <label for="workfare">Workfare pass holder</label> <br>
+    <input type="radio" id="senior" name="group" value="senior" required>
+    <label for="senior">Senior citizen</label> <br>
+    <input type="radio" id="disabled" name="group" value="disabilities" required>
+    <label for="disabled">Person with disabilities</label> <br>
+    <p>Payment by:</p>
+    <input type="radio" id="cash" name="payment_mode" value="cash" required>
+    <label for="cash">Cash</label> <br>
+    <input type="radio" id="card" name="payment_mode" value="card" required>
+    <label for="card">Card</label> <br>
     <input type="submit" value="Submit">
 </form>
+{% if err != None %}
+<p>Error: {{ err }}</p>
+{% endif %}
 </body>
 </html>

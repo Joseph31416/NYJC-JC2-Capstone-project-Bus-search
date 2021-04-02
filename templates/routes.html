@@ -6,6 +6,7 @@
 </head>
 <body>
 <h1>Results</h1>
+<h3>From {{ entry["start"] }} to  {{ entry["end"] }}, available options are:</h3>
 <table>
     <tr>
         {% for key in keys %}
@@ -16,9 +17,12 @@
         <tr>
             <td>{{ result[0] }}</td>
             <td>{{ result[1] }}</td>
+            <td>{{ result[2] }}</td>
         </tr>
     {% endfor %}
 </table>
+<p>Group: {{ entry["group"] }}</p>
+<p>Mode of payment: {{ entry["payment_mode"] }}</p>
 
 </body>
 </html>

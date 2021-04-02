@@ -1,5 +1,5 @@
 distance,adult_card_fare_per_ride,adult_cash_fare_per_ride,senior_citizen_card_fare_per_ride,senior_citizen_cash_fare_per_ride,student_card_fare_per_ride,student_cash_fare_per_ride,workfare_transport_concession_card_fare_per_ride,workfare_transport_concession_cash_fare_per_ride,persons_with_disabilities_card_fare_per_ride,persons_with_disabilities_cash_fare_per_ride
-Up to 3.2 km,92,170,59,120,42,85,68,170,59,120
+0.0 km - 3.2 km,92,170,59,120,42,85,68,170,59,120
 3.3 km - 4.2 km,102,190,66,120,47,85,76,190,66,120
 4.3 km - 5.2 km,112,190,73,120,52,85,84,190,73,120
 5.3 km - 6.2 km,122,190,80,120,57,85,92,190,80,120

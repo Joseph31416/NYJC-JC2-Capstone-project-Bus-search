@@ -1,0 +1,11 @@
+Bus_routes(
+    ServiceNo (PK), Direction (PK), StopSequence (PK), BusStopCode, Distance
+)
+
+Bus_stops(
+    BusStopCode (PK,FK), RoadName, Description, Latitude, Longitude
+)
+
+Bus_services(
+    ServiceNo (PK, FK), Category, Direction (PK), OriginCode (PK), DestinationCode
+)
