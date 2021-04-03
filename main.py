@@ -1,5 +1,5 @@
 from flask import Flask, request, redirect, render_template
-from database import create_conn, find_routes, optimal
+from database import create_conn, find_routes, optimal, match, get_bus_stop_code
 
 
 app = Flask(__name__)
@@ -34,12 +34,14 @@ def routes():
         else:
             err = "Invalid option."
             return render_template("input.html", err=err)
+        b1, b2 = match(conn, b1), match(conn, b2)
         entry = {"start": b1, "end": b2, "mode": mode, "group": group, "payment_mode": payment_mode}
-        bus_routes = find_routes(conn, (b1, b2))
+        b1_code, b2_code = get_bus_stop_code(conn, b1), get_bus_stop_code(conn, b2)
+        bus_routes = find_routes(conn, (b1_code, b2_code))
         if len(bus_routes) == 0:
             err = "No direct bus between these two stops."
             return render_template("input.html", err=err)
-        temp = optimal(conn, mode, b1, b2, bus_routes, group, payment_mode)
+        temp = optimal(conn, mode, b1_code, b2_code, bus_routes, group, payment_mode)
         results = [tuple(x.values()) for x in temp]
         keys = list(temp[0].keys())
         conn.close()

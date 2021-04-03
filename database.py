@@ -3,6 +3,7 @@ import json
 from calculation import quick_sort, find_max_min, insertion_sort, dist_range
 import math
 import csv
+from fuzzywuzzy import fuzz
 
 
 def create_conn():
@@ -40,6 +41,17 @@ def insertion(conn):
     conn.commit()
 
 
+def get_bus_stop_code(conn, bus_desc):
+    query = """
+            SELECT "BusStopCode"
+            FROM "Bus_stops"
+            WHERE "Description"=?;
+            """
+    cur = conn.cursor()
+    cur.execute(query, (bus_desc, ))
+    return cur.fetchone()[0]
+
+
 def sequence_check(conn, b1, b2, bus_route, direction):
     cur = conn.cursor()
     query = """
@@ -70,7 +82,7 @@ def find_routes(conn, bus_stops: tuple):
     route_set_1 = set(cur.fetchall())
     query_2 = """
             SELECT DISTINCT "ServiceNo", "Direction"
-            FROM "Bus_routes"
+            FROM "Bus_routes" 
             WHERE "BusStopCode"=?;
             """
     cur.execute(query_2, (bus_stops[1], ))
@@ -184,8 +196,29 @@ def optimal(conn, mode: str, start, end,
         return results
 
 
-# connection = create_conn()
+def match(conn, bus_desc):
+    cur = conn.cursor()
+    query = """
+            SELECT "Description"
+            FROM "Bus_stops";
+            """
+    cur.execute(query)
+    reference_list = [_[0] for _ in cur.fetchall()]
+    suggestion = None
+    m = None
+    for reference in reference_list:
+        score = fuzz.token_set_ratio(bus_desc, reference)
+        if m is None:
+            m = score
+            suggestion = reference
+        elif m < score:
+            m = score
+            suggestion = reference
+    return suggestion
+
+
+connection = create_conn()
 # routes = find_routes(connection, ("01012", "01311"))
 # find_multiple_stops(connection)
 # print(optimal(connection, "fare", "01012", "01311", routes, "student", "card"))
-# close_conn(connection)
+close_conn(connection)
