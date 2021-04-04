@@ -1,8 +1,9 @@
-from flask import Flask, request, redirect, render_template
-from database import create_conn, find_routes, optimal, match, get_bus_stop_code
+from flask import Flask, request, render_template
+from database import SqlOperations
 
 
 app = Flask(__name__)
+sql = SqlOperations()
 
 
 @app.route("/")
@@ -16,7 +17,6 @@ def routes():
     if request.method == "GET":
         return render_template("input.html", err=err)
     else:
-        conn = create_conn()
         b1 = request.form.get("BusStop1", None)
         b2 = request.form.get("BusStop2", None)
         if request.form.get("mode", None) in ["distance", "fare"]:
@@ -24,7 +24,7 @@ def routes():
         else:
             err = "Invalid option."
             return render_template("input.html", err=err)
-        if request.form.get("group", None) in  ["adult", "student", "senior", "workfare", "disabilities"]:
+        if request.form.get("group", None) in ["adult", "student", "senior", "workfare", "disabilities"]:
             group = request.form.get("group")
         else:
             err = "Invalid option."
@@ -34,17 +34,16 @@ def routes():
         else:
             err = "Invalid option."
             return render_template("input.html", err=err)
-        b1, b2 = match(conn, b1), match(conn, b2)
+        b1, b2 = sql.match(b1), sql.match(b2)
         entry = {"start": b1, "end": b2, "mode": mode, "group": group, "payment_mode": payment_mode}
-        b1_code, b2_code = get_bus_stop_code(conn, b1), get_bus_stop_code(conn, b2)
-        bus_routes = find_routes(conn, (b1_code, b2_code))
+        b1_code, b2_code = sql.get_bus_stop_code(b1), sql.get_bus_stop_code(b2)
+        bus_routes = sql.find_routes((b1_code, b2_code))
         if len(bus_routes) == 0:
             err = "No direct bus between these two stops."
             return render_template("input.html", err=err)
-        temp = optimal(conn, mode, b1_code, b2_code, bus_routes, group, payment_mode)
+        temp = sql.optimal(mode, b1_code, b2_code, bus_routes, group, payment_mode)
         results = [tuple(x.values()) for x in temp]
         keys = list(temp[0].keys())
-        conn.close()
         return render_template("routes.html", results=results, keys=keys, entry=entry)
 
 
