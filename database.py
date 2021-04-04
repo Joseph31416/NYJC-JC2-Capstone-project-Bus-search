@@ -2,13 +2,12 @@ import sqlite3
 from calculation import find_max_min, insertion_sort, dist_range
 import math
 from fuzzywuzzy import fuzz
-from config import Config
 
 
 class SqlOperations:
-    config = Config()
 
-    def __init__(self):
+    def __init__(self, config):
+        self.config = config
         self.conn = sqlite3.connect(self.config.DB_PATH, check_same_thread=False)
         self.cur = self.conn.cursor()
 

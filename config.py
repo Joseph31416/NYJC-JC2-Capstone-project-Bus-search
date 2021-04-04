@@ -14,3 +14,6 @@ class Config:
             ("disabilities", "card"): "Disabilities_card_fare"
         }
         self.DB_PATH = "./records.db"
+        self.MODE = ["distance", "fare"]
+        self.GROUP = ["adult", "student", "senior", "workfare", "disabilities"]
+        self.PAYMENT_MODE = ["cash", "card"]
