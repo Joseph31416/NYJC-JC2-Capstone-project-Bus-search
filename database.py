@@ -1,7 +1,6 @@
 import sqlite3
 from calculation import find_max_min, insertion_sort, dist_range
 import math
-from fuzzywuzzy import fuzz
 
 
 class SqlOperations:
@@ -10,6 +9,15 @@ class SqlOperations:
         self.config = config
         self.conn = sqlite3.connect(self.config.DB_PATH, check_same_thread=False)
         self.cur = self.conn.cursor()
+
+    def get_all_bus_stops(self):
+        query = """
+                SELECT DISTINCT "Description"
+                FROM "Bus_stops";
+                """
+        self.cur.execute(query)
+        results = [_[0] for _ in self.cur.fetchall()]
+        return results
 
     def get_bus_stop_code(self, bus_desc):
         query = """
@@ -143,40 +151,6 @@ class SqlOperations:
             results = insertion_sort(results, mode, "asc")
 
         return results
-
-    @classmethod
-    def permute(cls, elements):
-        if len(elements) <= 1:
-            yield elements
-        else:
-            for perm in cls.permute(elements[1:]):
-                for i in range(len(elements)):
-                    # nb elements[0:1] works in both string and list contexts
-                    yield perm[:i] + elements[0:1] + perm[i:]
-
-    def match(self, bus_desc):
-        query = """
-                SELECT "Description"
-                FROM "Bus_stops";
-                """
-        self.cur.execute(query)
-        reference_list = [_[0] for _ in self.cur.fetchall()]
-        suggestion, m = None, None
-        temp = bus_desc.strip().split(" ")
-        bus_desc_perm = [" ".join(perm) for perm in self.permute(temp)]
-        for reference in reference_list:
-            for desc in bus_desc_perm:
-                score = fuzz.token_set_ratio(desc, reference)
-                if score >= 75:
-                    return reference
-                if m is None:
-                    m = score
-                    suggestion = reference
-                elif m < score:
-                    m = score
-                    suggestion = reference
-        return suggestion
-
 
 
 #connection = create_conn()

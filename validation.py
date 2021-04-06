@@ -8,16 +8,16 @@ class Validation:
         self.group = None
         self.payment_mode = None
 
-    def set_params(self, b1_desc, b2_desc, mode, group, payment_mode):
-        self.b1_desc = b1_desc
-        self.b2_desc = b2_desc
-        self.mode = mode
-        self.group = group
-        self.payment_mode = payment_mode
+    def set_params(self, entry_dict):
+        self.b1_desc = entry_dict["start"]
+        self.b2_desc = entry_dict["end"]
+        self.mode = entry_dict["mode"]
+        self.group = entry_dict["group"]
+        self.payment_mode = entry_dict["payment_mode"]
 
     def check_desc(self):
         if self.b1_desc or self.b2_desc is None:
-            return "Please enter a description of the bus stop."
+            return "Please choose another bus stop."
         return None
 
     def check_mode(self):

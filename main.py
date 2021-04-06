@@ -17,26 +17,23 @@ def root():
 @app.route("/routes", methods=["POST", "GET"])
 def routes():
     err, err_msgs = None, None
+    descs = sql.get_all_bus_stops()
     if request.method == "GET":
-        return render_template("input.html", err=err, err_msgs=err_msgs)
+        return render_template("input.html", descs=descs, err=err, err_msgs=err_msgs)
     else:
-        b1 = request.form.get("BusStop1", None)
-        b2 = request.form.get("BusStop2", None)
-        mode = request.form.get("mode", None)
-        group = request.form.get("group", None)
-        payment_mode = request.form.get("payment_mode", None)
-        val.set_params(b1, b2, mode, group, payment_mode)
+        entry, keys = dict(), ["start", "end", "mode", "group", "payment_mode"]
+        for key in keys:
+            entry[key] = request.form.get(key, None)
+        val.set_params(entry)
         err_msgs, passed = val.check_all_input()
         if not passed:
-            return render_template("input.html", err=err, err_msgs=err_msgs)
-        b1, b2 = sql.match(b1), sql.match(b2)
-        entry = {"start": b1, "end": b2, "mode": mode, "group": group, "payment_mode": payment_mode}
-        b1_code, b2_code = sql.get_bus_stop_code(b1), sql.get_bus_stop_code(b2)
+            return render_template("input.html", descs=descs, err=err, err_msgs=err_msgs)
+        b1_code, b2_code = sql.get_bus_stop_code(entry["start"]), sql.get_bus_stop_code(entry["end"])
         bus_routes = sql.find_routes((b1_code, b2_code))
-        err, passed = val.check_routes(bus_routes, b1, b2)
+        err, passed = val.check_routes(bus_routes, entry["start"], entry["end"])
         if not passed:
-            return render_template("input.html", err=err, err_msgs=err_msgs)
-        temp = sql.optimal(mode, b1_code, b2_code, bus_routes, group, payment_mode)
+            return render_template("input.html", descs=descs, err=err, err_msgs=err_msgs)
+        temp = sql.optimal(entry["mode"], b1_code, b2_code, bus_routes, entry["group"], entry["payment_mode"])
         results = [tuple(x.values()) for x in temp]
         headers = ["Bus No.", "Distance (in km)", "Fare (in cents)"]
         return render_template("routes.html", results=results, headers=headers, entry=entry)

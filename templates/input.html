@@ -11,10 +11,18 @@
 <body>
 <p>Enter your search here:</p>
 <form method="POST">
-    <p>Starting point: </p>
-    <input type="text" name="BusStop1" required> <br>
-    <p>Destination: </p>
-    <input type="text" name="BusStop2" required> <br>
+    <label for="start">Starting Point:</label>
+    <select id="start" name="start">
+        {% for desc in descs %}
+            <option value="{{ desc }}">{{ desc }}</option>
+        {% endfor %}
+    </select>
+    <label for="end">Destination:</label>
+    <select id="end" name="end">
+        {% for desc in descs %}
+            <option value="{{ desc }}">{{ desc }}</option>
+        {% endfor %}
+    </select>
     {% if err_msgs[0] != None %}
     <p>{{ err_msgs[0] }}</p>
     {% endif %}
