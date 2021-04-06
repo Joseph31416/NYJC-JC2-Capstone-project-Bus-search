@@ -33,13 +33,13 @@ def routes():
         entry = {"start": b1, "end": b2, "mode": mode, "group": group, "payment_mode": payment_mode}
         b1_code, b2_code = sql.get_bus_stop_code(b1), sql.get_bus_stop_code(b2)
         bus_routes = sql.find_routes((b1_code, b2_code))
-        err, passed = val.check_routes(bus_routes)
+        err, passed = val.check_routes(bus_routes, b1, b2)
         if not passed:
             return render_template("input.html", err=err, err_msgs=err_msgs)
         temp = sql.optimal(mode, b1_code, b2_code, bus_routes, group, payment_mode)
         results = [tuple(x.values()) for x in temp]
-        keys = [_.title() for _ in list(temp[0].keys())]
-        return render_template("routes.html", results=results, keys=keys, entry=entry)
+        headers = ["Bus No.", "Distance (in km)", "Fare (in cents)"]
+        return render_template("routes.html", results=results, headers=headers, entry=entry)
 
 
 app.run()

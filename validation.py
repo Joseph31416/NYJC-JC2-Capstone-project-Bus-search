@@ -58,9 +58,10 @@ class Validation:
         return temp, passed
 
     @staticmethod
-    def check_routes(bus_routes):
+    def check_routes(bus_routes, b1, b2):
         passed = True
         if len(bus_routes) == 0:
-            err_msg = "No direct bus between these two stops."
+            err_msg = f"No direct bus between {b1} and {b2}."
+            passed = False
             return err_msg, passed
         return None, passed

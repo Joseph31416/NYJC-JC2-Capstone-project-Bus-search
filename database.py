@@ -136,13 +136,23 @@ class SqlOperations:
                 fare = self.cur.fetchone()[0]
             results.append(
                 {
-                    "route": route[0], "distance": distance, "fare": fare
+                    "route": route[0], "distance": distance, "fare": int(fare)
                 }
             )
             results = insertion_sort(results, "route", "asc")
             results = insertion_sort(results, mode, "asc")
 
         return results
+
+    @classmethod
+    def permute(cls, elements):
+        if len(elements) <= 1:
+            yield elements
+        else:
+            for perm in cls.permute(elements[1:]):
+                for i in range(len(elements)):
+                    # nb elements[0:1] works in both string and list contexts
+                    yield perm[:i] + elements[0:1] + perm[i:]
 
     def match(self, bus_desc):
         query = """
@@ -151,17 +161,22 @@ class SqlOperations:
                 """
         self.cur.execute(query)
         reference_list = [_[0] for _ in self.cur.fetchall()]
-        suggestion = None
-        m = None
+        suggestion, m = None, None
+        temp = bus_desc.strip().split(" ")
+        bus_desc_perm = [" ".join(perm) for perm in self.permute(temp)]
         for reference in reference_list:
-            score = fuzz.token_set_ratio(bus_desc, reference)
-            if m is None:
-                m = score
-                suggestion = reference
-            elif m < score:
-                m = score
-                suggestion = reference
+            for desc in bus_desc_perm:
+                score = fuzz.token_set_ratio(desc, reference)
+                if score >= 75:
+                    return reference
+                if m is None:
+                    m = score
+                    suggestion = reference
+                elif m < score:
+                    m = score
+                    suggestion = reference
         return suggestion
+
 
 
 #connection = create_conn()
