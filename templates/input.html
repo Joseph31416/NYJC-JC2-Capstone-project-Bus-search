@@ -8,23 +8,51 @@
     <meta charset="UTF-8">
     <title>Search</title>
 </head>
+<style>
+     body{
+        background-color: lightgrey;
+    }
+    #intro{
+        font-size: 20px;
+    }
+    body{
+        font-size: 15px;
+    }
+    .drop_list {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 15px;
+    font-family: Verdana;
+    line-height: 30px;
+    position:absolute;
+    left: 100px;
+    width: 300px;
+
+}
+
+</style>
 <body>
-<p>Enter your search here:</p>
+<b><p id="intro">Enter your search here</p></b>
 <form method="POST">
     <label for="start">Starting Point:</label>
-    <select id="start" name="start">
+    <select class="drop_list" id="start" name="start">
         {% for desc in descs %}
             <option value="{{ desc }}">{{ desc }}</option>
         {% endfor %}
     </select>
+    <br>
+    <br>
     <label for="end">Destination:</label>
-    <select id="end" name="end">
+    <select class="drop_list" id="end" name="end">
         {% for desc in descs %}
             <option value="{{ desc }}">{{ desc }}</option>
         {% endfor %}
     </select>
     {% if err_msgs[0] != None %}
-    <p>{{ err_msgs[0] }}</p>
+    <p style="color:red;">{{ err_msgs[0] }}</p>
+    {% endif %}
+    {% if err != None %}
+    <p style="color:red;">{{ err }}</p>
     {% endif %}
     <p>Sort by: </p>
     <input type="radio" id="dist" name="mode" value="distance" required>
@@ -32,7 +60,7 @@
     <input type="radio" id="fare" name="mode" value="fare" required>
     <label for="fare">Fare</label> <br>
     {% if err_msgs[1] != None %}
-    <p>{{ err_msgs[1] }}</p>
+    <p style="color:red;">{{ err_msgs[1] }}</p>
     {% endif %}
     <p>I am a/an:</p>
     <input type="radio" id="adult" name="group" value="adult" required>
@@ -46,7 +74,7 @@
     <input type="radio" id="disabled" name="group" value="disabilities" required>
     <label for="disabled">Person with disabilities</label> <br>
     {% if err_msgs[2] != None %}
-    <p>{{ err_msgs[2] }}</p>
+    <p style="color:red;">{{ err_msgs[2] }}</p>
     {% endif %}
     <p>Payment by:</p>
     <input type="radio" id="cash" name="payment_mode" value="cash" required>
@@ -54,13 +82,10 @@
     <input type="radio" id="card" name="payment_mode" value="card" required>
     <label for="card">Card</label> <br>
     {% if err_msgs[3] != None %}
-    <p>{{ err_msgs[3] }}</p>
+    <p style="color:red;">{{ err_msgs[3] }}</p>
     {% endif %}
     <input type="submit" value="Submit">
 </form>
-{% if err != None %}
-<p>Error: {{ err }}</p>
-{% endif %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
 </body>
 {% endblock %}

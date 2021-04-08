@@ -148,8 +148,12 @@ class SqlOperations:
                 }
             )
             results = insertion_sort(results, "route", "asc")
-            results = insertion_sort(results, mode, "asc")
-
+            if mode == "distance":
+                results = insertion_sort(results, "fare", "asc")
+                results = insertion_sort(results, "distance", "asc")
+            else:
+                results = insertion_sort(results, "distance", "asc")
+                results = insertion_sort(results, "fare", "asc")
         return results
 
 

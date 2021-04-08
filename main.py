@@ -36,6 +36,8 @@ def routes():
         temp = sql.optimal(entry["mode"], b1_code, b2_code, bus_routes, entry["group"], entry["payment_mode"])
         results = [tuple(x.values()) for x in temp]
         headers = ["Bus No.", "Distance (in km)", "Fare (in cents)"]
+        if entry["group"] in ["student", "senior", "workfare"]:
+            entry["group"] += " concession pass"
         return render_template("routes.html", results=results, headers=headers, entry=entry)
 
 

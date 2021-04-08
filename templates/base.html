@@ -9,10 +9,11 @@
     {% endif %}
 </head>
 <body>
-    <div>Go to:
+    <div>
         <a href="{{ url_for('root') }}">Home</a>
         <a href="{{ url_for('routes') }}">Finder</a>
     </div>
+    <hr>
     {% block content %}{% endblock %}
 </body>
 </html>
