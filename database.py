@@ -11,24 +11,43 @@ class SqlOperations:
         self.cur = self.conn.cursor()
 
     def get_all_bus_stops(self):
+        """
+        Returns a python list of bus stop descriptions and road names, concatenated by a comma.
+        E.g: 112 Katong and Joo Chiat Rd is concatenated to form 112 Katong, Joo Chiat Rd
+        """
         query = """
-                SELECT DISTINCT "Description"
-                FROM "Bus_stops";
+                SELECT DISTINCT "Description", "RoadName"
+                FROM "Bus_stops"
+                ORDER BY "Description";
                 """
         self.cur.execute(query)
-        results = [_[0] for _ in self.cur.fetchall()]
+        results = [", ".join(_) for _ in self.cur.fetchall()]
         return results
 
-    def get_bus_stop_code(self, bus_desc):
+    def get_bus_stop_code(self, bus_desc, bus_road_name):
+        """
+        :param bus_desc: Bus stop description
+        :param bus_road_name: Bus stop road name
+        :return: Returns a unique bus stop code when given the bus stop description and road name
+        """
         query = """
                 SELECT "BusStopCode"
                 FROM "Bus_stops"
-                WHERE "Description"=?;
+                WHERE "Description"=?
+                AND "RoadName"=?;
                 """
-        self.cur.execute(query, (bus_desc,))
+        self.cur.execute(query, (bus_desc, bus_road_name))
         return self.cur.fetchone()[0]
 
     def sequence_check(self, b1, b2, bus_route, direction):
+        """
+        :param b1: bus stop code of starting point
+        :param b2: bus stop code of destination
+        :param bus_route: a list of potential bus routes that contain both bus stops
+        :param direction: the direction of the bus route
+        :return: checks for the order of the bus stops on the bus routes and ensures that the bus stop of the starting
+        point comes after the bus stop of the destination on the bus route
+        """
         query = """
                 SELECT "BusStopCode", "Direction", "StopSequence"
                 FROM "bus_routes"
@@ -46,6 +65,10 @@ class SqlOperations:
             return False
 
     def find_routes(self, bus_stops: tuple):
+        """
+        :param bus_stops: takes in a tuple containing the starting and ending bus stop codes
+        :return: return a list of routes containing both bus stops
+        """
         query_1 = """
                 SELECT DISTINCT "ServiceNo", "Direction"
                 FROM "Bus_routes" 
@@ -67,28 +90,16 @@ class SqlOperations:
                 result.append(data)
         return result
 
-    def find_multiple_stops(self):
-        query = """
-                SELECT DISTINCT BusStopCode
-                FROM Bus_stops;
-                """
-        self.cur.execute(query)
-        bus_stops_list = self.cur.fetchall()
-        bus_stops_list = [x[0] for x in bus_stops_list]
-        n = len(bus_stops_list)
-        print(f"TOTAL: {n}")
-        common = []
-        for cnt1 in range(n):
-            for cnt2 in range(n):
-                if cnt1 != cnt2:
-                    if len(self.find_routes((bus_stops_list[cnt1], bus_stops_list[cnt2]))) > 10:
-                        print(f"ADDED: {(bus_stops_list[cnt1], bus_stops_list[cnt2])}")
-                        common.append((bus_stops_list[cnt1], bus_stops_list[cnt2]))
-            if not cnt1 % 10:
-                print(f"AT: {cnt1}")
-        print(common)
-
     def optimal(self, mode: str, start, end, routes, group="adult", payment_mode="cash"):
+        """
+        :param mode: mode for sorting
+        :param start: bus stop code of starting point
+        :param end: bus stop code of destination
+        :param routes: list of all routes containing both bus stops
+        :param group: citizen group that the user falls under, e.g. student, senior etc
+        :param payment_mode: user's mode of payment
+        :return:
+        """
         results = []
         group_payment = self.config.GROUP_PAYMENT
         for route in routes:
@@ -155,10 +166,3 @@ class SqlOperations:
                 results = insertion_sort(results, "distance", "asc")
                 results = insertion_sort(results, "fare", "asc")
         return results
-
-
-#connection = create_conn()
-# routes = find_routes(connection, ("01039", "01029"))
-#Bugis Cube, Opp Natl Lib
-# find_multiple_stops(connection)
-# close_conn(connection)

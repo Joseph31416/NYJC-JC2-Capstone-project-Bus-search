@@ -28,7 +28,10 @@ def routes():
         err_msgs, passed = val.check_all_input()
         if not passed:
             return render_template("input.html", descs=descs, err=err, err_msgs=err_msgs)
-        b1_code, b2_code = sql.get_bus_stop_code(entry["start"]), sql.get_bus_stop_code(entry["end"])
+        b1_desc, b1_rn = tuple(entry["start"].strip().split(','))
+        b2_desc, b2_rn = tuple(entry["end"].strip().split(','))
+        b1_rn, b2_rn = b1_rn.strip(), b2_rn.strip()
+        b1_code, b2_code = sql.get_bus_stop_code(b1_desc, b1_rn), sql.get_bus_stop_code(b2_desc, b2_rn)
         bus_routes = sql.find_routes((b1_code, b2_code))
         err, passed = val.check_routes(bus_routes, entry["start"], entry["end"])
         if not passed:
