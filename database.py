@@ -68,11 +68,16 @@ class SqlOperations:
         else:
             return False
 
-    def find_routes(self, bus_stops: tuple):
+    def find_routes(self, start, end):
         """
-        :param bus_stops: takes in a tuple containing the starting and ending bus stop codes
+        :param start: string containing the description and road name of the starting bus stop
+        :param end: string containing the description and road name of the ending bus stop
         :return: return a list of routes containing both bus stops
         """
+        (b1_desc, b1_rn), (b2_desc, b2_rn) = (lambda x, y: (tuple(x.strip().split(',')),
+                                                            tuple(y.strip().split(','))))(start, end)
+        bus_stops = (self.get_bus_stop_code(b1_desc.strip(), b1_rn.strip()),
+                     self.get_bus_stop_code(b2_desc.strip(), b2_rn.strip()))
         query_1 = """
                 SELECT DISTINCT "ServiceNo", "Direction"
                 FROM "Bus_routes" 
@@ -92,7 +97,7 @@ class SqlOperations:
         for data in working_result:
             if self.sequence_check(bus_stops[0], bus_stops[1], data[0], data[1]):
                 result.append(data)
-        return result
+        return result, bus_stops[0], bus_stops[1]
 
     def optimal(self, mode: str, start, end, routes, group="adult", payment_mode="cash"):
         """

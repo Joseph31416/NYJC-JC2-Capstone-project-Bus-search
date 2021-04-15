@@ -19,20 +19,21 @@ def routes():
     err, err_msgs = None, None
     descs = sql.get_all_bus_stops()
     if request.method == "GET":
+        # render input page
         return render_template("input.html", descs=descs, err=err, err_msgs=err_msgs)
     else:
+        # retrieve form submission
         entry = {key: request.form.get(key, None) for key in ["start", "end", "mode", "group", "payment_mode"]}
         val.set_params(entry)
+        # retrieve validation results
         err_msgs, passed = val.check_all_input()
         if not passed:
+            # render input page if input validation fails
             return render_template("input.html", descs=descs, err=err, err_msgs=err_msgs)
-        b1_desc, b1_rn = tuple(entry["start"].strip().split(','))
-        b2_desc, b2_rn = tuple(entry["end"].strip().split(','))
-        b1_rn, b2_rn = b1_rn.strip(), b2_rn.strip()
-        b1_code, b2_code = sql.get_bus_stop_code(b1_desc, b1_rn), sql.get_bus_stop_code(b2_desc, b2_rn)
-        bus_routes = sql.find_routes((b1_code, b2_code))
+        bus_routes, b1_code, b2_code = sql.find_routes(entry["start"], entry["end"])
         err, passed = val.check_routes(bus_routes, entry["start"], entry["end"])
         if not passed:
+            # render input page if routes verification fails
             return render_template("input.html", descs=descs, err=err, err_msgs=err_msgs)
         temp = sql.optimal(entry["mode"], b1_code, b2_code, bus_routes, entry["group"], entry["payment_mode"])
         results = [tuple(x.values()) for x in temp]
