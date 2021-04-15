@@ -51,8 +51,8 @@
     {% if err_msgs[0] != None %}
     <p style="color:red;">{{ err_msgs[0] }}</p>
     {% endif %}
-    {% if err != None %}
-    <p style="color:red;">{{ err }}</p>
+    {% if err_msgs[4] != None %}
+    <p style="color:red;">{{ err_msgs[4] }}</p>
     {% endif %}
     <p>Sort by: </p>
     <input type="radio" id="dist" name="mode" value="distance" required>

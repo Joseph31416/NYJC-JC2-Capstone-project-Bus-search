@@ -16,11 +16,11 @@ def root():
 
 @app.route("/routes", methods=["POST", "GET"])
 def routes():
-    err, err_msgs = None, None
+    err_msgs = [None]*5
     descs = sql.get_all_bus_stops()
     if request.method == "GET":
         # render input page
-        return render_template("input.html", descs=descs, err=err, err_msgs=err_msgs)
+        return render_template("input.html", descs=descs, err_msgs=err_msgs)
     else:
         # retrieve form submission
         entry = {key: request.form.get(key, None) for key in ["start", "end", "mode", "group", "payment_mode"]}
@@ -29,18 +29,21 @@ def routes():
         err_msgs, passed = val.check_all_input()
         if not passed:
             # render input page if input validation fails
-            return render_template("input.html", descs=descs, err=err, err_msgs=err_msgs)
+            return render_template("input.html", descs=descs, err_msgs=err_msgs)
         bus_routes, b1_code, b2_code = sql.find_routes(entry["start"], entry["end"])
-        err, passed = val.check_routes(bus_routes, entry["start"], entry["end"])
+        err_msgs[4], passed = val.check_routes(bus_routes, entry["start"], entry["end"])
         if not passed:
             # render input page if routes verification fails
-            return render_template("input.html", descs=descs, err=err, err_msgs=err_msgs)
-        temp = sql.optimal(entry["mode"], b1_code, b2_code, bus_routes, entry["group"], entry["payment_mode"])
-        results = [tuple(x.values()) for x in temp]
+            return render_template("input.html", descs=descs, err_msgs=err_msgs)
+        # retrieve entries for table
+        results = sql.optimal(entry["mode"], b1_code, b2_code, bus_routes, entry["group"], entry["payment_mode"])
+        # set headers
         headers = ["Bus No.", "Distance (in km)", "Fare (in cents)"]
+        # additional description to label
         if entry["group"] in ["student", "senior", "workfare"]:
             entry["group"] += " concession pass"
         return render_template("routes.html", results=results, headers=headers, entry=entry)
 
 
-app.run()
+if __name__ == "__main__":
+    app.run()

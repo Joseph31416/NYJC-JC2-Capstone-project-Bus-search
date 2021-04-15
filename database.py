@@ -174,4 +174,4 @@ class SqlOperations:
         else:
             results = insertion_sort(results, "distance")
             results = insertion_sort(results, "fare")
-        return results
+        return [tuple(x.values()) for x in results]

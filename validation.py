@@ -68,13 +68,14 @@ class Validation:
         """
         :return: runs check on description, mode, group and payment_mode and returns the result
         """
-        temp = (
+        temp = [
             self.check_desc(),
             self.check_mode(),
             self.check_group(),
-            self.check_payment_mode()
-        )
-        if temp != (None,)*4:
+            self.check_payment_mode(),
+            None
+        ]
+        if temp != [None]*5:
             passed = True
         else:
             passed = False
