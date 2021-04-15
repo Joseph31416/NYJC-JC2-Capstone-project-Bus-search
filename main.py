@@ -21,9 +21,7 @@ def routes():
     if request.method == "GET":
         return render_template("input.html", descs=descs, err=err, err_msgs=err_msgs)
     else:
-        entry, keys = dict(), ["start", "end", "mode", "group", "payment_mode"]
-        for key in keys:
-            entry[key] = request.form.get(key, None)
+        entry = {key: request.form.get(key, None) for key in ["start", "end", "mode", "group", "payment_mode"]}
         val.set_params(entry)
         err_msgs, passed = val.check_all_input()
         if not passed:

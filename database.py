@@ -4,6 +4,10 @@ import math
 
 
 class SqlOperations:
+    """
+    Methods: get_all_bus_stops, get_bus_stop_code, sequence_check, find_routes, optimal
+    Attributes: config, conn, cur
+    """
 
     def __init__(self, config):
         self.config = config
@@ -158,11 +162,11 @@ class SqlOperations:
                     "route": route[0], "distance": distance, "fare": int(fare)
                 }
             )
-            results = insertion_sort(results, "route", "asc")
-            if mode == "distance":
-                results = insertion_sort(results, "fare", "asc")
-                results = insertion_sort(results, "distance", "asc")
-            else:
-                results = insertion_sort(results, "distance", "asc")
-                results = insertion_sort(results, "fare", "asc")
+        results = insertion_sort(results, "route")
+        if mode == "distance":
+            results = insertion_sort(results, "fare")
+            results = insertion_sort(results, "distance")
+        else:
+            results = insertion_sort(results, "distance")
+            results = insertion_sort(results, "fare")
         return results

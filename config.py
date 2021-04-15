@@ -1,4 +1,7 @@
 class Config:
+    """
+    Attributes: GROUP_PAYMENT, DB_PATH, MODE, GROUP, PAYMENT_MODE
+    """
 
     def __init__(self):
         self.GROUP_PAYMENT = {
