@@ -23,23 +23,23 @@
 </head>
 <body>
 <h1 style="text-align:center">Results</h1>
-<h3 style="text-align:center">From {{ entry["start"] }} to  {{ entry["end"] }}:</h3>
-<table class="center" width="300px">
+<h3 style="text-align:center">Along ServiceNo {{ route }}:</h3>
+<table class="center" width="600px">
     <tr style="text-align:center">
-        {% for header in headers %}
-            <th> {{ header }} </th>
-        {% endfor %}
+        <th style="width:100px">Order</th>
+        <th style="width:200px">Bus Stop Code</th>
+        <th style="width:600px">Description</th>
     </tr>
     {% for result in results %}
         <tr>
-            <td style="text-align:center"><a href="{{ url_for('list_stops', route=result[0])}}">{{ result[0] }}</a></td>
-            <td style="text-align:center">{{ result[1] }}</td>
-            <td style="text-align:center">{{ result[2] }}</td>
+            <td style="text-align:center">{{ result['StopSequence'] }}</td>
+            <td style="text-align:center">{{ result['BusStopCode'] }}</td>
+            <td style="text-align:center">{{ result['BusStopDesc'] }}</td>
         </tr>
     {% endfor %}
 </table>
-<p style="text-align:center">Group: {{ entry["group"] }}</p>
-<p style="text-align:center">Mode of payment: {{ entry["payment_mode"] }}</p>
+<a href="{{ url_for('routes', _='')}}">Back</a>
+
 </body>
 {% endblock %}
 </html>

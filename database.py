@@ -175,3 +175,22 @@ class SqlOperations:
             results = insertion_sort(results, "distance")
             results = insertion_sort(results, "fare")
         return [tuple(x.values()) for x in results]
+
+    def get_all_stops(self, route, direction):
+        query = """
+                SELECT "Bus_routes"."StopSequence", "Bus_routes"."BusStopCode", 
+                "Bus_stops"."Description", "Bus_stops"."RoadName"
+                FROM "Bus_routes"
+                INNER JOIN "Bus_stops"
+                ON "Bus_routes"."BusStopCode"="Bus_stops"."BusStopCode"
+                WHERE ("Bus_routes"."ServiceNo"=? AND "Bus_routes"."Direction"=?);
+                """
+        self.cur.execute(query, (route, direction))
+        results = self.cur.fetchall()
+        arr = []
+        for result in results:
+            arr.append(
+                {"StopSequence": result[0], "BusStopCode": result[1], "BusStopDesc": ", ".join([result[2].title(), result[3]])}
+            )
+        return arr
+

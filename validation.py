@@ -82,16 +82,18 @@ class Validation:
         return temp, passed
 
     @staticmethod
-    def check_routes(bus_routes, b1, b2):
+    def check_routes(bus_routes, b1, b2, err_msg):
         """
         :param bus_routes: a string indicating the bus route
         :param b1: description of bus stop 1
         :param b2: description of bus stop 2
+        :param err_msg: existing list of error messages
         :return: returns an error message and the test result
         """
         passed = True
         if len(bus_routes) == 0:
-            err_msg = f"No direct bus between {b1} and {b2}."
+            err = f"No direct bus between {b1} and {b2}."
             passed = False
+            err_msg[4] = err
             return err_msg, passed
-        return None, passed
+        return err_msg, passed
