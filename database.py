@@ -187,10 +187,11 @@ class SqlOperations:
                 """
         self.cur.execute(query, (route, direction))
         results = self.cur.fetchall()
-        arr = []
-        for result in results:
-            arr.append(
-                {"StopSequence": result[0], "BusStopCode": result[1], "BusStopDesc": ", ".join([result[2].title(), result[3]])}
-            )
+        arr = [
+            {"StopSequence": result[0],
+             "BusStopCode": result[1],
+             "BusStopDesc": ", ".join([result[2].title(), result[3]])}
+            for result in results
+        ]
         return arr
 
