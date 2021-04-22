@@ -23,7 +23,7 @@ class Validation:
         self.group = entry_dict.get("group", None)
         self.payment_mode = entry_dict.get("payment_mode", None)
 
-    def check_desc(self):
+    def __check_desc(self):
         """
         :return: checks if either the description of bus stop 1 or 2 is a NoneType
         """
@@ -31,7 +31,7 @@ class Validation:
             return "Please choose another bus stop."
         return None
 
-    def check_mode(self):
+    def __check_mode(self):
         """
         :return: checks if mode is a NoneType and whether mode satisfies the presets
         """
@@ -42,7 +42,7 @@ class Validation:
                 return "Please enter a valid mode to sort by."
         return None
 
-    def check_group(self):
+    def __check_group(self):
         """
         :return: checks if group is a NoneType and whether group satisfies the presets
         """
@@ -53,7 +53,7 @@ class Validation:
                 return "PLease enter a valid payment group."
         return None
 
-    def check_payment_mode(self):
+    def __check_payment_mode(self):
         """
         :return: checks if payment_mode is a NoneType and whether payment_mode satisfies the presets
         """
@@ -69,10 +69,10 @@ class Validation:
         :return: runs check on description, mode, group and payment_mode and returns the result
         """
         temp = [
-            self.check_desc(),
-            self.check_mode(),
-            self.check_group(),
-            self.check_payment_mode(),
+            self.__check_desc(),
+            self.__check_mode(),
+            self.__check_group(),
+            self.__check_payment_mode(),
             None
         ]
         if temp != [None]*5:

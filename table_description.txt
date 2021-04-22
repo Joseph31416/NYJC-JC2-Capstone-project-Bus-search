@@ -1,11 +1,11 @@
 Bus_routes(
-    ServiceNo (PK), Direction (PK), StopSequence (PK), BusStopCode, Distance
+    ServiceNo (PK), Direction (PK), StopSequence (PK), BusStopCode (FK), Distance
 )
 
 Bus_stops(
-    BusStopCode (PK,FK), RoadName, Description, Latitude, Longitude
+    BusStopCode (PK), RoadName, Description, Latitude, Longitude
 )
 
 Bus_services(
-    ServiceNo (PK, FK), Category, Direction (PK), OriginCode (PK), DestinationCode
+    ServiceNo (PK), Category, Direction (PK), OriginCode (PK), DestinationCode
 )

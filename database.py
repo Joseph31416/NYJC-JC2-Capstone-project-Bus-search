@@ -5,7 +5,7 @@ import math
 
 class SqlOperations:
     """
-    Methods: get_all_bus_stops, get_bus_stop_code, sequence_check, find_routes, optimal
+    Methods: get_all_bus_stops, get_bus_stop_code, get_all_stops, sequence_check, find_routes, optimal
     Attributes: config, conn, cur
     """
 
@@ -28,7 +28,7 @@ class SqlOperations:
         results = [", ".join(_) for _ in self.cur.fetchall()]
         return results
 
-    def get_bus_stop_code(self, bus_desc, bus_road_name):
+    def __get_bus_stop_code(self, bus_desc, bus_road_name):
         """
         :param bus_desc: Bus stop description
         :param bus_road_name: Bus stop road name
@@ -43,7 +43,7 @@ class SqlOperations:
         self.cur.execute(query, (bus_desc, bus_road_name))
         return self.cur.fetchone()[0]
 
-    def sequence_check(self, b1, b2, bus_route, direction):
+    def __sequence_check(self, b1, b2, bus_route, direction):
         """
         :param b1: bus stop code of starting point
         :param b2: bus stop code of destination
@@ -76,8 +76,8 @@ class SqlOperations:
         """
         (b1_desc, b1_rn), (b2_desc, b2_rn) = (lambda x, y: (tuple(x.strip().split(',')),
                                                             tuple(y.strip().split(','))))(start, end)
-        bus_stops = (self.get_bus_stop_code(b1_desc.strip(), b1_rn.strip()),
-                     self.get_bus_stop_code(b2_desc.strip(), b2_rn.strip()))
+        bus_stops = (self.__get_bus_stop_code(b1_desc.strip(), b1_rn.strip()),
+                     self.__get_bus_stop_code(b2_desc.strip(), b2_rn.strip()))
         query_1 = """
                 SELECT DISTINCT "ServiceNo", "Direction"
                 FROM "Bus_routes" 
@@ -95,7 +95,7 @@ class SqlOperations:
         working_result = list(route_set_1.intersection(route_set_2))
         result = []
         for data in working_result:
-            if self.sequence_check(bus_stops[0], bus_stops[1], data[0], data[1]):
+            if self.__sequence_check(bus_stops[0], bus_stops[1], data[0], data[1]):
                 result.append(data)
         return result, bus_stops[0], bus_stops[1]
 

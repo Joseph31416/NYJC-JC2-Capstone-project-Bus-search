@@ -50,7 +50,7 @@ def routes():
         # check if such bus routes exist
         err_msgs, passed = val.check_routes(bus_routes, entry["start"], entry["end"], err_msgs)
         if not passed:
-            # render input page if routes verification fails
+            # render input page if routes verification fails, error message will be displayed
             return render_template("input.html", descs=descs, err_msgs=err_msgs)
         # retrieve entries for table
         results = sql.optimal(entry["mode"], b1_code, b2_code, bus_routes, entry["group"], entry["payment_mode"])

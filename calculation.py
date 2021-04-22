@@ -1,6 +1,6 @@
 import re
 
-
+# helper functions that are used in the program
 def insertion_sort(arr, key):
     """
     :param arr: input contains a list of dictionaries with route, distance and fare as keys
