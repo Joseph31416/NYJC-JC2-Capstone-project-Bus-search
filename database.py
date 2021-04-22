@@ -107,7 +107,7 @@ class SqlOperations:
         :param routes: list of all routes containing both bus stops
         :param group: citizen group that the user falls under, e.g. student, senior etc
         :param payment_mode: user's mode of payment
-        :return:
+        :return: outputs a list of tuples containing route, distance and fare information
         """
         results = []
         group_payment = self.config.GROUP_PAYMENT
@@ -177,6 +177,11 @@ class SqlOperations:
         return [tuple(x.values()) for x in results]
 
     def get_all_stops(self, route, direction):
+        """
+        :param route: an input string denoting the bus service number
+        :param direction: an integer denoting the direction of the bus  
+        :return: outputs a list of dictionaries containing StopSequence, BusStopCode, BusStopDesc 
+        """
         query = """
                 SELECT "Bus_routes"."StopSequence", "Bus_routes"."BusStopCode", 
                 "Bus_stops"."Description", "Bus_stops"."RoadName"

@@ -1,9 +1,11 @@
+# standard imports
 from flask import Flask, request, render_template, session, redirect, url_for
 from env import secret_key
 from database import SqlOperations
 from validation import Validation
 from config import Config
 
+# variable configurations
 app = Flask(__name__)
 app.secret_key = secret_key
 config = Config()
@@ -18,6 +20,10 @@ def root():
 
 @app.route("/routes", methods=["POST", "GET"])
 def routes():
+    """
+    /routes handles input to search for bus services between two bus stops, output the result and redirects 
+    to /list_stops
+    """
     err_msgs = [None]*5
     headers = ["Bus No.", "Distance (in km)", "Fare (in cents)"]
     descs = sql.get_all_bus_stops()
@@ -26,6 +32,7 @@ def routes():
             # render input page
             return render_template("input.html", descs=descs, err_msgs=err_msgs)
         else:
+            # render previous search results
             results = session["results"]
             entry = session["entry"]
             return render_template("routes.html", results=results, headers=headers, entry=entry)
@@ -57,6 +64,10 @@ def routes():
 
 @app.route("/list_stops", methods=["GET", "POST"])
 def list_stops():
+    """
+    /list_stops displays the all stops on a specific bus route. 
+    It can redirect the user back to /routes  
+    """
     if request.method == "GET":
         route = request.args.get("route", None)
         if route is None:
@@ -65,6 +76,4 @@ def list_stops():
         results = sql.get_all_stops(route, direction)
         return render_template("stops.html", route=route, results=results)
 
-
-if __name__ == "__main__":
-    app.run()
+app.run('0.0.0.0')
