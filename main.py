@@ -15,6 +15,8 @@ val = Validation(config)
 
 @app.route("/")
 def root():
+    for key in list(session.keys()):
+        session.pop(key)
     return render_template("index.html")
 
 
@@ -75,5 +77,7 @@ def list_stops():
         direction = session["route_direction"][route]
         results = sql.get_all_stops(route, direction)
         return render_template("stops.html", route=route, results=results)
+    else:
+        return redirect(url_for("routes"))
 
 app.run('0.0.0.0')
