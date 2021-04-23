@@ -3,6 +3,7 @@ import csv
 # These functions are not used in the program. They were initially used to setup the database
 # and test the outputs of the program
 
+
 def data_retrieval(filename):
     """
     :param filename: file name of the required file containing bus data

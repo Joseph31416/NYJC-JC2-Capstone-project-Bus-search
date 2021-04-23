@@ -26,8 +26,11 @@ def routes():
     /routes handles input to search for bus services between two bus stops, output the result and redirects 
     to /list_stops
     """
+    # list of error messages
     err_msgs = [None]*5
+    # list of headers to be displayed
     headers = ["Bus No.", "Distance (in km)", "Fare (in cents)"]
+    # list of descriptions of all bus stops
     descs = sql.get_all_bus_stops()
     if request.method == "GET":
         if request.args.get("_", None) is None or request.args.get("_", None) != '':
@@ -59,6 +62,7 @@ def routes():
         # additional description to label
         if entry["group"] in ["student", "senior", "workfare"]:
             entry["group"] += " concession pass"
+        # store previous search results in the session
         session["route_direction"] = {x[0]: x[1] for x in bus_routes}
         session["results"], session["entry"] = results, entry
         return render_template("routes.html", results=results, headers=headers, entry=entry)
@@ -73,11 +77,16 @@ def list_stops():
     if request.method == "GET":
         route = request.args.get("route", None)
         if route is None:
+            # redirects user back to search page if no routes were recorded
             return redirect(url_for("routes"))
+        # retrieves direction of the route desired
         direction = session["route_direction"][route]
+        # queries search results
         results = sql.get_all_stops(route, direction)
         return render_template("stops.html", route=route, results=results)
     else:
         return redirect(url_for("routes"))
 
-app.run('0.0.0.0')
+
+if __name__ == "__main__":
+    app.run()
