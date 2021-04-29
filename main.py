@@ -33,9 +33,11 @@ def routes():
     # list of descriptions of all bus stops
     descs = sql.get_all_bus_stops()
     if request.method == "GET":
-        if request.args.get("_", None) is None or request.args.get("_", None) != '':
+        if request.args.get("_", None) is None:
             # render input page
             return render_template("input.html", descs=descs, err_msgs=err_msgs)
+        elif request.args.get("_", None) != '':
+            return redirect(url_for("routes"))
         else:
             # render previous search results
             results = session["results"]
@@ -76,11 +78,11 @@ def list_stops():
     """
     if request.method == "GET":
         route = request.args.get("route", None)
-        if route is None:
-            # redirects user back to search page if no routes were recorded
-            return redirect(url_for("routes"))
         # retrieves direction of the route desired
-        direction = session["route_direction"][route]
+        direction = session["route_direction"].get(route, None)
+        if direction is None:
+            # redirects user back to search page if no routes were recorded or the route to search is invalid
+            return redirect(url_for("routes"))
         # queries search results
         results = sql.get_all_stops(route, direction)
         return render_template("stops.html", route=route, results=results)
