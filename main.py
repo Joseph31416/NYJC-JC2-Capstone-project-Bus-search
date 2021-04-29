@@ -79,6 +79,9 @@ def list_stops():
     It can redirect the user back to /routes  
     """
     if request.method == "GET":
+        if session.get("route_direction", None) is None:
+            # redirects user back to search page if no routes were recorded
+            return redirect(url_for("routes"))
         route = request.args.get("route", None)
         # retrieves direction of the route desired
         direction = session["route_direction"].get(route, None)
