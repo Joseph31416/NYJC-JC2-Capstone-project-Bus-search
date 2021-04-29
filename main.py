@@ -40,8 +40,10 @@ def routes():
             return redirect(url_for("routes"))
         else:
             # render previous search results
-            results = session["results"]
-            entry = session["entry"]
+            results = session.get("results", None)
+            entry = session.get("entry", None)
+            if entry is None or results is None:
+                return redirect(url_for("routes"))
             return render_template("routes.html", results=results, headers=headers, entry=entry)
     else:
         # retrieve form submission
