@@ -87,6 +87,4 @@ def list_stops():
     else:
         return redirect(url_for("routes"))
 
-
-if __name__ == "__main__":
-    app.run()
+app.run('0.0.0.0')
